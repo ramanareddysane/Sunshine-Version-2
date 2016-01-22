@@ -264,20 +264,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             // If we don't need to restart the loader, and there's a desired position to restore
             // to, do so now.
         }
-        TextView tv = (TextView) getView().findViewById(R.id.empty_view);
-        String message = (String) tv.getText();
-        if(mForecastAdapter.getCount() == 0){
-            Context ctx = getActivity();
-            ConnectivityManager connectivityManager
-                    = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-            if(null == networkInfo) {
-                    message =  getString(R.string.empty_forecast_list_no_network);
-            } else if(networkInfo.isConnectedOrConnecting()) {
-                    message = "Fetching weather data";
-            }
-            tv.setText(message);
-        }
+        updateEmptyView();
     }
 
     @Override
@@ -289,6 +276,23 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         mUseTodayLayout = useTodayLayout;
         if (mForecastAdapter != null) {
             mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
+        }
+    }
+
+    public void updateEmptyView(){
+        TextView tv = (TextView) getView().findViewById(R.id.empty_view);
+        String message = (String) tv.getText();
+        if(mForecastAdapter.getCount() == 0){
+            Context ctx = getActivity();
+            ConnectivityManager connectivityManager
+                    = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            if(null == networkInfo) {
+                message =  getString(R.string.empty_forecast_list_no_network);
+            } else if(networkInfo.isConnectedOrConnecting()) {
+                message = "Fetching weather data";
+            }
+            tv.setText(message);
         }
     }
 }
