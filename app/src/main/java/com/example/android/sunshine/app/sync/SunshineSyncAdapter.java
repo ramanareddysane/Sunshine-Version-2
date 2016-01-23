@@ -124,6 +124,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                     .build();
 
             URL url = new URL(builtUri.toString());
+            Log.d(LOG_TAG,"::"+url.toString());
 
             // Create the request to OpenWeatherMap, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -149,6 +150,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
             if (buffer.length() == 0) {
                 // Stream was empty.  No point in parsing.
+                setLocationStatus(getContext(), LOCATION_STATUS_SERVER_DOWN);
                 return;
             }
             forecastJsonStr = buffer.toString();
@@ -157,9 +159,11 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attempting
             // to parse it.
+            setLocationStatus(getContext(),LOCATION_STATUS_SERVER_DOWN);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
+            setLocationStatus(getContext(),LOCATION_STATUS_SERVER_INVALID);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -174,6 +178,22 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
         }
         return;
     }
+
+    /**
+     *  Helper method to set the location status to shared preferences.
+     *  This method should not be called from UI thread, because it uses commit
+     *  to write changes to Shared preferences
+     *  @param ctx Context in which the shared preferences need to be set.
+     *  @param  locaionstatus the intDef value to set.
+     */
+    private static void setLocationStatus(Context ctx, @LOCATION_STATUS int locaionstatus){
+        SharedPreferences sp  = PreferenceManager.getDefaultSharedPreferences(ctx);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt(ctx.getString(R.string.pref_location_status_key),locaionstatus);
+        editor.commit();
+    }
+
+
 
     /**
      * Take the String representing the complete forecast in JSON Format and
@@ -321,12 +341,14 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             Log.d(LOG_TAG, "Sync Complete. " + cVVector.size() + " Inserted");
-
+            setLocationStatus(getContext(),LOCATION_STATUS_OK);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
+            setLocationStatus(getContext(),LOCATION_STATUS_SERVER_INVALID);
         }
     }
+
 
     private void notifyWeather() {
         Context context = getContext();
@@ -550,5 +572,11 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static void initializeSyncAdapter(Context context) {
         getSyncAccount(context);
+    }
+
+    @Override
+    public void onSyncCanceled() {
+        super.onSyncCanceled();
+
     }
 }
