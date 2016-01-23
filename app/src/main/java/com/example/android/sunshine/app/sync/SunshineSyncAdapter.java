@@ -253,7 +253,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                         setLocationStatus(getContext(),LOCATION_STATUS_INVALID);
                         return;
                     default:
-                        setLocationStatus(getContext(),LOCATION_STATUS_SERVER_DOWN);
+                        setLocationStatus(getContext(),LOCATION_STATUS_UNKNOWN);
                         return;
                 }
             }

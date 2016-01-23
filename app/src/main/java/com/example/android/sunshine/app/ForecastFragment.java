@@ -306,9 +306,12 @@ public class ForecastFragment extends Fragment implements
         if( null != tv ){
             int message = R.string.empty_message;
             Context ctx = getActivity();
-            @SunshineSyncAdapter.LOCATION_STATUS
-            int location_status = Utility.getLocationstatus(ctx);
+            @SunshineSyncAdapter.LOCATION_STATUS int location_status = Utility.getLocationstatus(ctx);
+
             switch (location_status){
+                case SunshineSyncAdapter.LOCATION_STATUS_OK:
+                    tv.setText("Gotcha. YOu are about to see the data");
+                    return;
                 case SunshineSyncAdapter.LOCATION_STATUS_SERVER_DOWN:
                     message = R.string.empty_forecast_list_server_down;
                     break;
