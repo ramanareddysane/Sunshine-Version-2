@@ -17,11 +17,11 @@ package com.example.android.sunshine.app;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -43,7 +43,8 @@ import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
 /**
  * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
  */
-public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ForecastFragment extends Fragment implements
+        LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener {
     public static final String LOG_TAG = ForecastFragment.class.getSimpleName();
     private ForecastAdapter mForecastAdapter;
 
@@ -85,6 +86,27 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     static final int COL_WEATHER_CONDITION_ID = 6;
     static final int COL_COORD_LAT = 7;
     static final int COL_COORD_LONG = 8;
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equals(getString(R.string.pref_location_status_key))){
+            updateEmptyView();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        sp.unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        sp.registerOnSharedPreferenceChangeListener(this);
+    }
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -280,19 +302,27 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     public void updateEmptyView(){
-        TextView tv = (TextView) getView().findViewById(R.id.empty_view);
-        String message = (String) tv.getText();
         if(mForecastAdapter.getCount() == 0){
-            Context ctx = getActivity();
-            ConnectivityManager connectivityManager
-                    = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-            if(null == networkInfo) {
-                message =  getString(R.string.empty_forecast_list_no_network);
-            } else if(networkInfo.isConnectedOrConnecting()) {
-                message = "Fetching weather data";
-            }
-            tv.setText(message);
+            TextView tv = (TextView) getView().findViewById(R.id.empty_view);
+           if( null != tv ){
+               int message = R.string.empty_message;
+               Context ctx = getActivity();
+               @SunshineSyncAdapter.LOCATION_STATUS
+               int location_status = Utility.getLocationstatus(ctx);
+               switch (location_status){
+                   case SunshineSyncAdapter.LOCATION_STATUS_SERVER_DOWN:
+                       message = R.string.empty_forecast_list_server_down;
+                       break;
+                   case SunshineSyncAdapter.LOCATION_STATUS_SERVER_INVALID:
+                       message = R.string.empty_forecast_list_server_down;
+                       break;
+                   default:
+                       if(!Utility.isNetworkAvailable(ctx)){
+                           message = R.string.empty_message;
+                       }
+               }
+               tv.setText(message);
+           }
         }
     }
 }

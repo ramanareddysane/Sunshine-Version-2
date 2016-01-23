@@ -22,9 +22,12 @@ import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.text.format.Time;
 
+import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.prefs.Preferences;
 
 public class Utility {
     public static String getPreferredLocation(Context context) {
@@ -255,5 +258,16 @@ public class Utility {
                 (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = manager.getActiveNetworkInfo();
         return activeNetwork!=null && activeNetwork.isConnectedOrConnecting();
+    }
+
+    /**
+     * Method to get Location status from Preferences
+     * @param c is used to get Shared Preferences.
+     * @return returns location status integer type.
+     */
+    @SuppressWarnings("ResourceType")
+    static public @SunshineSyncAdapter.LOCATION_STATUS int getLocationstatus(Context context){
+        SharedPreferences sp  = PreferenceManager.getDefaultSharedPreferences(context);
+               return sp.getInt(context.getString(R.string.pref_location_status_key), SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN);
     }
 }
