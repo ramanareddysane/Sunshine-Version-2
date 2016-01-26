@@ -98,7 +98,6 @@ public class ForecastAdapter extends CursorAdapter {
         Glide.with(mContext)
                 .load(Utility.getArtUrlForWeatherCondition(mContext,weatherid))
                 .error(iconid)
-                .crossFade()
                 .into(viewHolder.iconView);
         // Read date from cursor
         long dateInMillis = cursor.getLong(ForecastFragment.COL_WEATHER_DATE);
