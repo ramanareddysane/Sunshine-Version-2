@@ -22,7 +22,6 @@ public class RegistrationIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Toast.makeText(this, "Handling registration ", Toast.LENGTH_SHORT).show();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
