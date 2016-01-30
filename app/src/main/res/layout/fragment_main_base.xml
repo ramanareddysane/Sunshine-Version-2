@@ -1,0 +1,27 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="@dimen/landscape_forecast_view_width"
+    android:layout_height="match_parent"
+    android:elevation="@dimen/appbar_elevation"
+    android:layout_gravity="center"
+    tools:context=".MainActivity">
+
+    <ListView
+        style="@style/ForecastListStyle"
+        android:id="@+id/listview_forecast"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@null"
+        android:background="#fef7f4f5">
+    </ListView>
+    <TextView
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:padding="16dp"
+        android:layout_margin="16dp"
+        android:textSize="15sp"
+        android:layout_height="wrap_content"
+        android:text="@string/empty_message"
+        />
+</FrameLayout>
