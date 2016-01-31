@@ -303,7 +303,7 @@ public class Utility {
 
     /**
      * Method to get Location status from Preferences
-     * @param c is used to get Shared Preferences.
+     * @param context is used to get Shared Preferences.
      * @return returns location status integer type.
      */
     @SuppressWarnings("ResourceType")
